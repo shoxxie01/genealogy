@@ -5,6 +5,9 @@ import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 //Zadanie 1.
 // Napisz klasę Person, w której znajdować będą się dane odpowiadające wierszowi pliku.
@@ -152,6 +155,61 @@ public class Person implements Serializable{
         ) {
             return (List<Person>) ois.readObject();
         }
+    }
+
+    public String generateUML(){
+        StringBuilder sb =new StringBuilder();
+
+        Function<Person, String> deleteSpaces = p -> p.getName().replaceAll(" ","");
+        Function<Person, String> addObject = p -> "object " + deleteSpaces.apply(p);
+        String nameSurname = deleteSpaces.apply(this);
+
+        sb
+                .append("@startuml\n")
+                .append(addObject.apply(this));
+
+        if(!parents.isEmpty()){
+            sb.append(parents
+                    .stream()
+                    .map(p -> "\n" + addObject.apply(p) + "\n" + deleteSpaces.apply(p) + " <-- " +nameSurname + "\n")
+                    .collect(Collectors.joining()));
+        }
+        sb.append("\n@enduml");
+        return sb.toString();
+    }
+
+    public static String generateUML(List<Person> people){
+        StringBuilder sb = new StringBuilder();
+        Function<Person, String> deleteSpaces = p -> p.getName().replaceAll(" ","");
+        Function<Person, String> addObject = p -> "object " + deleteSpaces.apply(p);
+        sb.append("@startuml");
+        sb.append(people
+                .stream()
+                .map(p -> "\n" + addObject.apply(p))
+                .collect(Collectors.joining()));
+        sb.append("\n");
+        sb.append(people
+                .stream()
+                .flatMap(person -> person.parents.isEmpty() ? Stream.empty() :
+                        person.parents.stream().map(p -> deleteSpaces.apply(p) + " <-- " + deleteSpaces.apply(person) + "\n"))
+                .collect(Collectors.joining()));
+        sb.append("\n@enduml");
+        return sb.toString();
+    }
+
+    public static List<Person> filterByName(List<Person> people, String substring){
+        return people
+                .stream()
+                .filter(p -> p.getName().contains(substring))
+                .collect(Collectors.toList());
+    }
+
+    public static  List<Person> sortByName(List<Person> people){
+        Function<Person, Long> birthDateToLong = p -> p.birthDate.toEpochDay();
+
+        return people
+                .stream()
+                .sorted(Comparator.comparingLong(birthDateToLong::apply)).toList();
     }
 
     //<----------------------------------------------------------------------------------------zad7
