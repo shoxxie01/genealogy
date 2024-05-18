@@ -9,10 +9,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-//Zadanie 1.
-// Napisz klasę Person, w której znajdować będą się dane odpowiadające wierszowi pliku.
-// Na tym etapie pomiń wczytywanie rodziców. Napisz metodę wytwórczą fromCsvLine()
-// klasy Person przyjmującą jako argument linię opisanego pliku.
+
 public class Person implements Serializable{
     private final String name;
     private final LocalDate birthDate;
@@ -33,27 +30,17 @@ public class Person implements Serializable{
         LocalDate deathDate = line[2].equals("")?null : LocalDate.parse(line[2],formatter);
         return new Person(line[0], birthDate, deathDate);
     }
-    //Zadanie 2.
-    //Napisz metodę fromCsv(), która przyjmie ścieżkę do pliku i zwróci listę obiektów typu Person.
+
     public static List<Person> fromCsv(String path) {
         List<Person> people = new ArrayList<>();
-        //<----------------------------------------------------------------zad5
 
         Map<String, PersonWithParentsNames> mapPersonWithParentNames = new HashMap<>();
-        //<----------------------------------------------------------------zad5
 
         try (BufferedReader br = new BufferedReader(new FileReader(path))) {
             String line;
             br.readLine();
             while ((line = br.readLine()) != null) {
-                // <---------------------------------zad2
-                //Person person = Person.fromCsvLine(line);
-                   // person.validateLifeSpan();
-                   // person.validateAmbiguous(people);
 
-                //people.add(person);
-                // <---------------------------------zad2
-                //<---------------------------------zad5
                 PersonWithParentsNames personWithNames = PersonWithParentsNames.fromCsvLine(line);
                 personWithNames.getPerson().validateLifeSpan();
                 personWithNames.getPerson().validateAmbiguous(people);
@@ -61,7 +48,6 @@ public class Person implements Serializable{
                 Person person = personWithNames.getPerson();
                 people.add(person);
                 mapPersonWithParentNames.put(person.name,personWithNames);
-                //<-------------------------------- zad5
 
             }
             PersonWithParentsNames.linkRelatives(mapPersonWithParentNames);
@@ -137,8 +123,6 @@ public class Person implements Serializable{
     }
 
 
-    //<----------------------------------------------------------------------------------------zad7
-
     public static void toBinaryFile(List<Person> people, String filename) throws IOException {
         try (
                 FileOutputStream fos = new FileOutputStream(filename);
@@ -211,7 +195,5 @@ public class Person implements Serializable{
                 .stream()
                 .sorted(Comparator.comparingLong(birthDateToLong::apply)).toList();
     }
-
-    //<----------------------------------------------------------------------------------------zad7
 
 }
