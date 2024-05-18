@@ -9,7 +9,8 @@ import java.nio.charset.StandardCharsets;
 public class PlantUMLRunner {
 
     public static String plantUMLPath;
-    public static void setPath(String plantUMLPath){
+    public static void setPath(String plantUMLPath)
+    {
         PlantUMLRunner.plantUMLPath = plantUMLPath;
     }
 
